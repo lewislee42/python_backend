@@ -4,6 +4,7 @@ import sys
 
 anvil.server.connect("server_65AETVAAR2ECR7NHUNXRVTFU-VNSFI7HNPKP4C2H3")
 
+
 def getAccess():
 	UID = "u-s4t2ud-058e90a7f8903709a87ec8ea12f10f9ee8a4bb4aa9d16bc40eb9670f03169689"
 	SECRET = "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"
@@ -59,27 +60,36 @@ def getStudentInfo():
 
 def getCoalitioninfo():
 	access_token = getAccess()
-	coal = 180
-	url = "https://api.intra.42.fr/v2/coalitions/" + str(coal) + "/users"
-	page = 1
+	arr = []
+	for i in range(180, 184):
+		url = "https://api.intra.42.fr/v2/coalitions/" + str(i) + "/users"
+		page = 1
+		while (True):
+			params = {
+				"access_token": access_token,
+				"page[size]": 100,
+				"page[number]": page,
+			}
+			response = requests.get(url, params=params)
+			if response.status_code == 200 and len(response.json()) > 0:
+				arr.append(response.json())
+				page += 1
+			else:
+				break
+	return arr
 
-	for ()
-	params = {
-		"access_token": access_token,
-		"page[size]": 100,
-		"page[number]": page,
-	}
-	response = requests.get(url, params=params)
-	if response.status_code == 200:
-		response_json = response.json()
-		return (response_json)
-	else:
-		print("Error:", response.status_code, response.text)
+
+def getActive(coalitions_users):
+	coalitionsList = coalitions_users
+	arr = []
+	for i in coalitionsList:
+		[arr.append(x) for x in i if x['active?']]
+	return arr
 
 
 student_json = getStudentInfo()
 coalitions_json = getCoalitioninfo()
-print(coalitions_json)
+active_json = getActive(coalitions_json)
 
 
 @anvil.server.callable
