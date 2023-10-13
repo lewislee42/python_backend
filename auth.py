@@ -1,13 +1,17 @@
 import requests
 import anvil.server
 import sys
+from dotenv import load_dotenv
+import os
 
 anvil.server.connect("server_65AETVAAR2ECR7NHUNXRVTFU-VNSFI7HNPKP4C2H3")
+load_dotenv()
 
 
 def getAccess():
-	UID = "u-s4t2ud-058e90a7f8903709a87ec8ea12f10f9ee8a4bb4aa9d16bc40eb9670f03169689"
-	SECRET = "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"
+	UID = os.getenv("UID")
+	SECRET = os.getenv("SECRET")
+	print(UID, SECRET)
 	url = 'https://api.intra.42.fr/v2/oauth/token'
 	
 	payload = {
