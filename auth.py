@@ -4,14 +4,13 @@ import sys
 from dotenv import load_dotenv
 import os
 
-anvil.server.connect("server_65AETVAAR2ECR7NHUNXRVTFU-VNSFI7HNPKP4C2H3")
 load_dotenv()
+anvil.server.connect(os.getenv("SERVER"))
 
 
 def getAccess():
 	UID = os.getenv("UID")
 	SECRET = os.getenv("SECRET")
-	print(UID, SECRET)
 	url = 'https://api.intra.42.fr/v2/oauth/token'
 	
 	payload = {
@@ -84,16 +83,57 @@ def getCoalitioninfo():
 
 
 def getActive(coalitions_users):
-	coalitionsList = coalitions_users
 	arr = []
-	for i in coalitionsList:
+	for i in coalitions_users:
 		[arr.append(x) for x in i if x['active?']]
 	return arr
 
 
+month_to_number = {
+    'january': 1,
+    'february': 2,
+    'march': 3,
+    'april': 4,
+    'may': 5,
+    'june': 6,
+    'july': 7,
+    'august': 8,
+    'september': 9,
+    'october': 10,
+    'november': 11,
+    'december': 12
+}
+
+def get_birth_month(student):
+	year = student['pool_year']
+	month = student['pool_month']
+	if (year == None):
+		year = 1990
+	else:
+		year = int(year)
+	if (month == None):
+		month = 1
+	else:
+		month = int(month_to_number[month])
+	return (year, month)
+
+def getBatches(students):
+	sorted_students = sorted(students, key=get_birth_month)
+	return sorted_students
+
+
 student_json = getStudentInfo()
+print("Student data loaded")
 coalitions_json = getCoalitioninfo()
+print("Coalition data loaded")
 active_json = getActive(coalitions_json)
+print("Active Students loaded")
+batch_json = getBatches(coalitions_json[0] + coalitions_json[1] + coalitions_json[2] + coalitions_json[3])
+
+
+@anvil.server.callable
+def getStudentObject():
+	return student_json
 
 
 @anvil.server.callable
