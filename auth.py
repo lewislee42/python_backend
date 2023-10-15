@@ -176,7 +176,7 @@ def numberToWords(number):
         '8': 'eight',
         '9': 'nine'
     }
-    return ''.join([digit_to_word[digit] for digit in str(number)])
+    return ' '.join([digit_to_word[digit] for digit in str(number)])
 
 
 @anvil.server.callable
