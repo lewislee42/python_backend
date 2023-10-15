@@ -179,6 +179,11 @@ def numberTWords(number):
     return ''.join([digit_to_word[digit] for digit in str(number)])
 
 
+@anvil.server.callable
+def monthToNumber(month):
+	return (month_to_number[month])
+
+
 # # print(getStudentByLogin('lewlee'))
 # # print(getStudentByLogin('zhwong'))
 # # print(getStudentByLogin('hang'))
