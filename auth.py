@@ -126,14 +126,15 @@ student_json = getStudentInfo()
 print("Loaded " + str(len(student_json)) + " Students")
 coalitions_json = getCoalitioninfo()
 print("Coalition data loaded")
-active_json = getActive(coalitions_json)
-print("Active Students loaded")
-batch_json = getBatches(coalitions_json[0] + coalitions_json[1] + coalitions_json[2] + coalitions_json[3])
+#active_json = getActive(coalitions_json)
+#print("Active Students loaded")
+#batch_json = getBatches(coalitions_json[0] + coalitions_json[1] + coalitions_json[2] + coalitions_json[3])
 
 
 @anvil.server.callable
 def getStudentObject():
-	return student_json
+        cdat = [[x for x in cdat if x['active?'] and x['kind'] == 'student'] for cdat in coalitions_json]
+	return cdat
 
 
 @anvil.server.callable
