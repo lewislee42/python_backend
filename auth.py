@@ -163,7 +163,7 @@ def getStudentByLogin(login):
 
 
 @anvil.server.callable
-def numberTWords(number):
+def numberToWords(number):
     digit_to_word = {
         '0': 'zero',
         '1': 'one',
