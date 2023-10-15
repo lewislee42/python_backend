@@ -133,8 +133,8 @@ print("Coalition data loaded")
 
 @anvil.server.callable
 def getStudentObject():
-        cdat = [[x for x in cdat if x['active?'] and x['kind'] == 'student'] for cdat in coalitions_json]
-        return cdat
+	cdat = [[x for x in cdat if x['active?'] and x['kind'] == 'student'] for cdat in coalitions_json]
+	return cdat
 
 
 @anvil.server.callable
