@@ -123,7 +123,7 @@ def getBatches(students):
 
 
 student_json = getStudentInfo()
-print("Student data loaded")
+print("Loaded " + str(len(student_json)) + " Students")
 coalitions_json = getCoalitioninfo()
 print("Coalition data loaded")
 active_json = getActive(coalitions_json)
@@ -149,6 +149,28 @@ def getStudentCoalition(id):
 		return (response_json)
 	else:
 		print("Error:", response.status_code, response.text)
+
+
+@anvil.server.callable
+def getStudentByLogin(login):
+	access_token = getAccess()
+	url = "https://api.intra.42.fr/v2/users/" + login
+	params = {"access_token": access_token}
+	response = requests.get(url, params=params)
+	if response.status_code == 200 and len(response.json()) > 0:
+		return response.json()
+
+
+# # print(getStudentByLogin('lewlee'))
+# # print(getStudentByLogin('zhwong'))
+# # print(getStudentByLogin('hang'))
+
+# GETTING THE STUDENT TO SEE IF THEY HAVE ENTERED CORE
+# hang = getStudentByLogin('zhwong')
+# hang_c = [x['cursus']['name'] for x in hang['cursus_users']]
+# if "42cursus" in hang_c:
+# 	print("yess")
+# print(hang_c)
 
 
 anvil.server.wait_forever()
