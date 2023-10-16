@@ -82,14 +82,14 @@ def getStudentInfo():
 #	return arr
 
 
-def getActive(coalitions_users):
-	arr = []
-	for i in coalitions_users:
-		[arr.append(x) for x in i if x['active?']]
-	return arr
+#def getActive(coalitions_users):
+#	arr = []
+#	for i in coalitions_users:
+#		[arr.append(x) for x in i if x['active?']]
+#	return arr
 
 
-def getAllCoalition():
+def getCoalitioninfo():
 	access_token = getAccess()
 	arr = []
 	for i in range(180, 184):
@@ -156,8 +156,8 @@ def getBatches(students):
 
 student_json = getStudentInfo()
 print("Loaded " + str(len(student_json)) + " Students")
-#coalitions_json = getCoalitioninfo()
-coalitions_json = getCoalitionStudents()
+coalitions_json = getCoalitioninfo()
+#coalitions_json = getCoalitionStudents()
 print("Loaded data from " + str(len(coalitions_json)) + " coalitions")
 #active_json = getActive(coalitions_json)
 #print("Active Students loaded")
@@ -245,4 +245,4 @@ print("len of coalitions_json arr 4", len(coalitions_json[3]))
 # print(hang_c)
 
 
-#anvil.server.wait_forever()
+anvil.server.wait_forever()
