@@ -12,16 +12,16 @@ def getAccess():
 	UID = os.getenv("UID")
 	SECRET = os.getenv("SECRET")
 	url = 'https://api.intra.42.fr/v2/oauth/token'
-	
+
 	payload = {
-    "client_id": UID,
-    "client_secret": SECRET,
-    "grant_type": "client_credentials"
-	}
+			"client_id": UID,
+			"client_secret": SECRET,
+			"grant_type": "client_credentials"
+			}
 
 	headers = {
-		"Cache-Control": "no-store"
-	}
+			"Cache-Control": "no-store"
+			}
 
 	response = requests.post(url, data=payload, headers=headers)
 
@@ -37,16 +37,16 @@ def getStudentInfo():
 	access_token = getAccess()
 	page = 1
 	url = "https://api.intra.42.fr/v2/campus/34/users"
-	
+
 	arr = []
-	
+
 	while (True):
 		params = {
-			"access_token": access_token,
-			"page[size]": 100,
-			"page[number]": page,
-			"filter[staff?]": "false"
-		}
+				"access_token": access_token,
+				"page[size]": 100,
+				"page[number]": page,
+				"filter[staff?]": "false"
+				}
 		response = requests.get(url, params=params)
 		if response.status_code == 200:
 			data = response.json()
@@ -61,25 +61,25 @@ def getStudentInfo():
 	return arr
 
 
-def getCoalitioninfo():
-	access_token = getAccess()
-	arr = []
-	for i in range(180, 184):
-		url = "https://api.intra.42.fr/v2/coalitions/" + str(i) + "/users"
-		page = 1
-		while (True):
-			params = {
-				"access_token": access_token,
-				"page[size]": 100,
-				"page[number]": page,
-			}
-			response = requests.get(url, params=params)
-			if response.status_code == 200 and len(response.json()) > 0:
-				arr.append(response.json())
-				page += 1
-			else:
-				break
-	return arr
+#def getCoalitioninfo():
+#	access_token = getAccess()
+#	arr = []
+#	for i in range(180, 184):
+#		url = "https://api.intra.42.fr/v2/coalitions/" + str(i) + "/users"
+#		page = 1
+#		while (True):
+#			params = {
+#				"access_token": access_token,
+#				"page[size]": 100,
+#				"page[number]": page,
+#			}
+#			response = requests.get(url, params=params)
+#			if response.status_code == 200 and len(response.json()) > 0:
+#				arr.append(response.json())
+#				page += 1
+#			else:
+#				break
+#	return arr
 
 
 def getActive(coalitions_users):
@@ -89,20 +89,79 @@ def getActive(coalitions_users):
 	return arr
 
 
+def getAllCoalition():
+	access_token = getAccess()
+	url = "https://api.intra.42.fr/v2/coalitions"
+	coals = list()
+	page = 1
+	while (True):
+		params = {
+				"access_token": access_token,
+				"page[size]": 100,
+				"page[number]": page,
+				}
+		response = requests.get(url, params=params)
+		if response.status_code == 200:
+			if len(response.json()) == 0:
+				break;
+			coals += response.json()
+		else:
+			break;
+		page += 1
+	return coals
+
+
+def getCoalitionId(cname):
+	coals = getAllCoalition()
+	for c in coals:
+		if c['name'] == cname:
+			return c['id']
+
+
+def getCoalitionStudents():
+	access_token = getAccess()
+	cnames = [
+			'Bug Busters', 
+			'Unix Unicorns',
+			'Segmentation Slayers', 
+			'Kernel Kamikazes'
+			]
+	cdat = list()
+	for c in cnames:
+		cid = getCoalitionId(c)
+		url = "https://api.intra.42.fr/v2/coalitions/" + str(cid) + "/users"
+		cst = list()
+		page = 1
+		while (True):
+			params = {
+					"access_token": access_token,
+					"page[size]": 100,
+					"page[number]": page,
+					}
+			response = requests.get(url, params=params)
+			if response.status_code == 200 and len(response.json()) > 0:
+				cst += response.json()
+				page += 1
+			else:
+				break
+		cdat.append(cst)
+	return cdat
+
+
 month_to_number = {
-    'january': 1,
-    'february': 2,
-    'march': 3,
-    'april': 4,
-    'may': 5,
-    'june': 6,
-    'july': 7,
-    'august': 8,
-    'september': 9,
-    'october': 10,
-    'november': 11,
-    'december': 12
-}
+		'january': 1,
+		'february': 2,
+		'march': 3,
+		'april': 4,
+		'may': 5,
+		'june': 6,
+		'july': 7,
+		'august': 8,
+		'september': 9,
+		'october': 10,
+		'november': 11,
+		'december': 12
+		}
 
 def get_birth_month(student):
 	year = student['pool_year']
@@ -124,8 +183,9 @@ def getBatches(students):
 
 student_json = getStudentInfo()
 print("Loaded " + str(len(student_json)) + " Students")
-coalitions_json = getCoalitioninfo()
-print("Coalition data loaded")
+#coalitions_json = getCoalitioninfo()
+coalitions_json = getCoalitionStudents()
+print("Loaded data from " + str(len(coalitions_json)) + " coalitions")
 #active_json = getActive(coalitions_json)
 #print("Active Students loaded")
 #batch_json = getBatches(coalitions_json[0] + coalitions_json[1] + coalitions_json[2] + coalitions_json[3])
@@ -142,8 +202,8 @@ def getStudentCoalition(id):
 	access_token = getAccess()
 	url = "https://api.intra.42.fr/v2/users/" + id + "/coalitions"
 	params = {
-		"access_token": access_token,
-	}
+			"access_token": access_token,
+			}
 	response = requests.get(url, params=params)
 	if response.status_code == 200:
 		response_json = response.json()
@@ -164,19 +224,19 @@ def getStudentByLogin(login):
 
 @anvil.server.callable
 def numberToWords(number):
-    digit_to_word = {
-        '0': 'zero',
-        '1': 'one',
-        '2': 'two',
-        '3': 'three',
-        '4': 'four',
-        '5': 'five',
-        '6': 'six',
-        '7': 'seven',
-        '8': 'eight',
-        '9': 'nine'
-    }
-    return ' '.join([digit_to_word[digit] for digit in str(number)])
+	digit_to_word = {
+			'0': 'zero',
+			'1': 'one',
+			'2': 'two',
+			'3': 'three',
+			'4': 'four',
+			'5': 'five',
+			'6': 'six',
+			'7': 'seven',
+			'8': 'eight',
+			'9': 'nine'
+			}
+	return ' '.join([digit_to_word[digit] for digit in str(number)])
 
 
 @anvil.server.callable
@@ -192,7 +252,7 @@ def monthToNumber(month):
 # hang = getStudentByLogin('zhwong')
 # hang_c = [x['cursus']['name'] for x in hang['cursus_users']]
 # if "42cursus" in hang_c:
-# 	print("yess")
+#	print("yess")
 # print(hang_c)
 
 
