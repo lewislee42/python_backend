@@ -91,46 +91,9 @@ def getActive(coalitions_users):
 
 def getAllCoalition():
 	access_token = getAccess()
-	url = "https://api.intra.42.fr/v2/coalitions"
-	coals = list()
-	page = 1
-	while (True):
-		params = {
-				"access_token": access_token,
-				"page[size]": 100,
-				"page[number]": page,
-				}
-		response = requests.get(url, params=params)
-		if response.status_code == 200:
-			if len(response.json()) == 0:
-				break;
-			coals += response.json()
-		else:
-			break;
-		page += 1
-	return coals
-
-
-def getCoalitionId(cname):
-	coals = getAllCoalition()
-	for c in coals:
-		if c['name'] == cname:
-			return c['id']
-
-
-def getCoalitionStudents():
-	access_token = getAccess()
-	cnames = [
-			'Bug Busters', 
-			'Unix Unicorns',
-			'Segmentation Slayers', 
-			'Kernel Kamikazes'
-			]
-	cdat = list()
-	for c in cnames:
-		cid = getCoalitionId(c)
-		url = "https://api.intra.42.fr/v2/coalitions/" + str(cid) + "/users"
-		cst = list()
+	arr = []
+	for i in range(180, 184):
+		url = "https://api.intra.42.fr/v2/coalitions/" + str(i) + "/users"
 		page = 1
 		while (True):
 			params = {
@@ -139,13 +102,23 @@ def getCoalitionStudents():
 					"page[number]": page,
 					}
 			response = requests.get(url, params=params)
-			if response.status_code == 200 and len(response.json()) > 0:
-				cst += response.json()
-				page += 1
-			else:
+			if response.status_code != 200 or len(response.json()) == 0:
 				break
-		cdat.append(cst)
-	return cdat
+			response_json = response.json()
+			if page == 1:
+				arr.append(response_json)
+			else:
+				for j in response_json:
+					arr[i - 180].append(j)
+			page += 1
+	return arr
+
+
+def getActive(coalitions_users):
+	arr = []
+	for i in coalitions_users:
+		[arr.append(x) for x in i if x['active?']]
+	return arr
 
 
 month_to_number = {
@@ -194,6 +167,14 @@ print("Loaded data from " + str(len(coalitions_json)) + " coalitions")
 @anvil.server.callable
 def getStudentObject():
 	cdat = [[x for x in cdat if x['active?'] and x['kind'] == 'student'] for cdat in coalitions_json]
+	#print(len(cdat))
+	#print("cdat0 ", len(cdat[0]))
+	#print("cdat1 ", len(cdat[1]))
+	#print("cdat2 ", len(cdat[2]))
+	#print("cdat3 ", len(cdat[3]))
+	#print("cdat4 ", len(cdat[4]))
+
+	#print(cdat[0])
 	return cdat
 
 
@@ -243,7 +224,15 @@ def numberToWords(number):
 def monthToNumber(month):
 	return (month_to_number[month])
 
-
+#getStudentObject()
+print("len of coalitions_json", len(coalitions_json))
+print(type(coalitions_json[0]))
+print("len of coalitions_json arr 1", len(coalitions_json[0]))
+print("len of coalitions_json arr 2", len(coalitions_json[1]))
+print("len of coalitions_json arr 3", len(coalitions_json[2]))
+print("len of coalitions_json arr 4", len(coalitions_json[3]))
+#print("len of coalitions_json arr 5", len(coalitions_json[4]))
+#print(coalitions_json[1][0])
 # # print(getStudentByLogin('lewlee'))
 # # print(getStudentByLogin('zhwong'))
 # # print(getStudentByLogin('hang'))
@@ -256,4 +245,4 @@ def monthToNumber(month):
 # print(hang_c)
 
 
-anvil.server.wait_forever()
+#anvil.server.wait_forever()
